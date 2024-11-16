@@ -8,6 +8,7 @@ output: github_document
 ```{r, message=FALSE}
 library(tidyverse)
 library(dplyr)
+library(ggplot2)
 
 knitr::opts_chunk$set(
 	warning = FALSE,
@@ -18,6 +19,37 @@ knitr::opts_chunk$set(
 theme_set(theme_minimal())
 ```
 
+## Problem 1
+```{r}
+check_shared_birthday <- function(n) {
+  birthdays <- sample(1:365, size = n, replace = TRUE)
+  has_duplicates <- any(duplicated(birthdays))  # Check if there are duplicates
+  return(has_duplicates)
+}
+
+group_sizes <- 2:50
+num_simulations <- 10000
+
+
+set.seed(42)  # For reproducibility
+probabilities <- sapply(group_sizes, function(n) {
+  mean(replicate(num_simulations, check_shared_birthday(n)))
+})
+
+# Plot
+plot_data <- data.frame(GroupSize = group_sizes, Probability = probabilities)
+
+ggplot(plot_data, aes(x = GroupSize, y = Probability)) +
+  geom_line() +
+  geom_point()
+  theme_minimal() +
+  labs(
+    x = "Group Size",
+    y = "Probability of Shared Birthday",
+    title = "Probability of Shared Birthdays vs Group Size"
+  )
+```
+Probability of shared birthdays grows when group size grows, and the tendency shows a "S" shape. Larger the group size, the probability tends to 1.
 
 
 
@@ -31,12 +63,13 @@ mu = 0:6
 num_simulations = 5000
 alpha = 0.05
 
-simulate_t_test <- function(mu, n, sigma) {
+simulate_t_test <- function(mu, n, sigma) 
+ {
   sample <- rnorm(n, mean = mu, sd = sigma)
   test_result <- t.test(sample, mu = 0, conf.level = 0.95)
   tidy_result <- broom::tidy(test_result) %>%
     rename(mu_hat = estimate, p_value = p.value)
-  return(tidy_result[c("mu_hat", "p_value")])
+    return(tidy_result[c("mu_hat", "p_value")])
 }
 
 # Perform One-Sample t-Test
@@ -82,9 +115,8 @@ power_results %>%
        x = "True µ", 
        y = "Power")
 ```
+The graph shows that the power of the test grows when μ increases, demonstrating that greater effect sizes correspond to enhanced power. But there is an observable leveling off in power at higher effect sizes, indicating a threshold beyond which additional increases in effect size do not substantially improve the power of the test.
 
-1. Comments:
-The graph illustrates that the power of the test grows with an increase in the true value of μ, demonstrating that greater effect sizes correspond to enhanced power. Nonetheless, there is an observable leveling off in power at higher effect sizes, indicating a threshold beyond which additional increases in effect size do not substantially improve the power of the test.
 
 ```{r}
 # Estimate plot
@@ -111,9 +143,7 @@ power_results %>%
        y = "Mean Estimate") +
   theme(legend.title = element_blank())
 ```
-
-2. Answers:
-As the true value of μ rises, the average of the sample estimates μ_hat in tests where the null hypothesis is rejected increasingly aligns with the true μ.
+As the true value of μ grows, the average of the sample estimates μ_hat in tests where the null hypothesis is rejected increasingly aligns with the true μ.
 
 Explanation: When μ is relatively small, samples showing a significantly higher μ_hat than the true μ are more likely to lead to the rejection of the null hypothesis, resulting in a higher mean of μ_hat compared to μ. However, as μ increases, samples where μ_hat is closer to μ are more frequently associated with null hypothesis rejections, leading to the mean of μ_hat becoming progressively closer to the true μ.
 
@@ -122,7 +152,8 @@ Explanation: When μ is relatively small, samples showing a significantly higher
 
 Load the Data:
 ```{r, message=FALSE}
-homicide = read_csv("./data/homicide-data.csv") |> janitor::clean_names()
+homicide = read_csv("./data/homicide-data.csv") |> 
+            janitor::clean_names()
 ```
 The `homicide` dataset includes data on homicide incidents in the United States spanning from 2007 to 2017. It is comprised of `r nrow(homicide)` rows and `r ncol(homicide)` columns.
 
